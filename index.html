@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STREAMHUB - Movie & TV Series Discovery</title>
+    <script src="https://tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style>
+        body { background-color: #0b0c10; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hero-gradient { background: linear-gradient(to top, #0b0c10 10%, rgba(11, 12, 16, 0.6) 50%, rgba(11, 12, 16, 0.2) 100%); }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 bg-[#0b0c10]/90 backdrop-blur-md border-b border-gray-800 px-4 md:px-10 py-3 flex justify-between items-center">
+        <div class="flex items-center space-x-6">
+            <a href="#" onclick="resetHome()" class="text-2xl font-extrabold tracking-wider text-red-600 flex items-center gap-2">
+                <i class="fa-solid fa-play-circle"></i> STREAM<span class="text-white">HUB</span>
+            </a>
+            <div class="hidden md:flex space-x-6 text-sm font-medium text-gray-300">
+                <button onclick="resetHome()" class="hover:text-white transition">Home</button>
+                <button onclick="fetchCategory('movie/popular', 'Popular Movies')" class="hover:text-white transition">Movies</button>
+                <button onclick="fetchCategory('tv/popular', 'Top TV Series')" class="hover:text-white transition">TV Series</button>
+                <button onclick="showWatchlist()" class="hover:text-white transition">My List (<span id="list-count">0</span>)</button>
+            </div>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="relative w-48 md:w-72">
+            <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="Search movies, series..." 
+                class="w-full bg-gray-900 text-sm text-white rounded-full pl-4 pr-10 py-2 border border-gray-700 focus:outline-none focus:border-red-600">
+            <i class="fa-solid fa-search absolute right-3.5 top-2.5 text-gray-400 text-sm"></i>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content" class="pt-16">
+        
+        <!-- Hero Section -->
+        <section id="hero-section" class="relative h-[70vh] md:h-[80vh] w-full flex items-end pb-12 px-4 md:px-12 bg-cover bg-center">
+            <div class="absolute inset-0 hero-gradient"></div>
+            <div class="relative z-10 max-w-2xl space-y-4">
+                <span class="bg-red-600 text-xs font-bold px-2.5 py-1 rounded uppercase tracking-wider">Trending #1</span>
+                <h1 id="hero-title" class="text-3xl md:text-5xl font-extrabold leading-tight">Loading...</h1>
+                <div class="flex items-center space-x-4 text-sm text-gray-300">
+                    <span id="hero-rating" class="text-green-400 font-bold"><i class="fa-solid fa-star"></i> 0.0</span>
+                    <span id="hero-date">2025</span>
+                    <span class="border border-gray-500 px-1.5 py-0.5 text-xs rounded">4K UHD</span>
+                </div>
+                <p id="hero-overview" class="text-gray-300 text-sm md:text-base line-clamp-3">Fetching latest movies from TMDB...</p>
+                <div class="flex space-x-4 pt-2">
+                    <button id="hero-watch-btn" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center gap-2 transition">
+                        <i class="fa-solid fa-play"></i> Watch Trailer
+                    </button>
+                    <button id="hero-list-btn" class="bg-gray-800/80 hover:bg-gray-700 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center gap-2 border border-gray-600 transition">
+                        <i class="fa-solid fa-plus"></i> My List
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Sections Container -->
+        <div id="sections-container" class="px-4 md:px-12 py-8 space-y-10"></div>
+
+        <!-- Search / Grid View Container -->
+        <div id="grid-container" class="hidden px-4 md:px-12 py-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="grid-title" class="text-2xl font-bold">Search Results</h2>
+                <button onclick="resetHome()" class="text-sm text-red-500 hover:underline">Back to Home</button>
+            </div>
+            <div id="grid-items" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5"></div>
+        </div>
+
+    </main>
+
+    <!-- Video Player Modal -->
+    <div id="player-modal" class="fixed inset-0 z-50 hidden bg-black/95 flex items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl bg-gray-900 rounded-xl overflow-hidden border border-gray-800 shadow-2xl">
+            <div class="flex justify-between items-center p-4 border-b border-gray-800">
+                <h3 id="modal-title" class="font-bold text-lg truncate">Movie Title</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div class="aspect-video w-full bg-black flex items-center justify-center">
+                <iframe id="video-iframe" class="w-full h-full" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div class="p-4 bg-gray-900 text-sm text-gray-400 flex justify-between items-center">
+                <span>Source: Official TMDB / YouTube Stream</span>
+                <button id="modal-list-btn" class="text-white bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded text-xs">
+                    + Add to Watchlist
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 mt-16 py-8 px-4 md:px-12 text-center text-gray-500 text-xs space-y-2">
+        <p class="text-gray-300 font-semibold text-sm">STREAMHUB • Open-Source Media Indexing Client</p>
+        <p>Disclaimer: This site does not host or store any video files on its servers. All metadata and trailers are provided by the TMDB API.</p>
+        <p>© 2026 STREAMHUB. Built with TMDB API.</p>
+    </footer>
+    <!-- JavaScript Logic -->
+    <script>
+        // নিচে আপনার TMDB API KEY বসান
+        const API_KEY = 'YOUR_TMDB_API_KEY_HERE'; 
+
+        const BASE_URL = 'https://themoviedb.org';
+        const IMG_URL = 'https://tmdb.org';
+        const BACKDROP_URL = 'https://tmdb.org';
+
+        let watchlist = JSON.parse(localStorage.getItem('myWatchlist')) || [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateWatchlistCount();
+            if (API_KEY === '55a539170381681f8819be75900765d2') {
+                alert('দয়া করে কোডের ভেতরে আপনার TMDB API Key বসান!');
+                return;
+            }
+            loadHomePage();
+        });
+
+        async function loadHomePage() {
+            const trending = await fetchData('/trending/all/day');
+            if (trending && trending.results && trending.results.length > 0) {
+                setupHero(trending.results[0]);
+            }
+
+            const container = document.getElementById('sections-container');
+            container.innerHTML = '';
+
+            const categories = [
+                { title: 'Trending Now', endpoint: '/trending/all/week' },
+                { title: 'Popular Movies', endpoint: '/movie/popular' },
+                { title: 'Top Rated TV Series', endpoint: '/tv/top_rated' },
+                { title: 'Action & Sci-Fi Blockbusters', endpoint: '/discover/movie?with_genres=28,878' },
+                { title: 'Top Anime & Animation', endpoint: '/discover/tv?with_genres=16' }
+            ];
+
+            for (let cat of categories) {
+                const data = await fetchData(cat.endpoint);
+                if (data && data.results) {
+                    renderRow(cat.title, data.results, container);
+                }
+            }
+        }
+
+        async function fetchData(endpoint) {
+            const separator = endpoint.includes('?') ? '&' : '?';
+            try {
+                const res = await fetch(BASE_URL + endpoint + separator + 'api_key=' + API_KEY);
+                return await res.json();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                return null;
+            }
+        }
+
+        function setupHero(item) {
+            const hero = document.getElementById('hero-section');
+            const title = item.title || item.name;
+            const date = (item.release_date || item.first_air_date || '').split('-')[0];
+            const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
+
+            hero.style.backgroundImage = "url('" + BACKDROP_URL + item.backdrop_path + "')";
+            document.getElementById('hero-title').innerText = title;
+            document.getElementById('hero-rating').innerHTML = '<i class="fa-solid fa-star"></i> ' + item.vote_average.toFixed(1);
+            document.getElementById('hero-date').innerText = date;
+            document.getElementById('hero-overview').innerText = item.overview;
+
+            document.getElementById('hero-watch-btn').onclick = () => openPlayer(item.id, mediaType, title, item);
+            document.getElementById('hero-list-btn').onclick = () => toggleWatchlist(item);
+        }
+
+        function renderRow(title, items, container) {
+            const section = document.createElement('div');
+            section.innerHTML = '<h2 class="text-xl md:text-2xl font-bold mb-4">' + title + '</h2>' +
+                '<div class="flex space-x-4 overflow-x-auto no-scrollbar pb-4">' +
+                items.map(item => createCardHTML(item)).join('') +
+                '</div>';
+            container.appendChild(section);
+        }
+
+        function createCardHTML(item) {
+            if (!item.poster_path) return '';
+            const title = item.title || item.name;
+            const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
+            const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
+            const itemString = encodeURIComponent(JSON.stringify(item));
+            const safeTitle = title.replace(/'/g, "\\'");
+
+            return '<div onclick="openPlayer(' + item.id + ', \'' + mediaType + '\', \'' + safeTitle + '\', \'' + itemString + '\')" ' +
+                'class="min-w-[150px] md:min-w-[185px] cursor-pointer group relative rounded-lg overflow-hidden bg-gray-900 transition transform hover:scale-105">' +
+                '<img src="' + IMG_URL + item.poster_path + '" alt="' + safeTitle + '" class="w-full h-[225px] md:h-[275px] object-cover">' +
+                '<div class="absolute top-2 right-2 bg-black/80 text-yellow-400 text-xs font-bold px-2 py-1 rounded">★ ' + rating + '</div>' +
+                '<div class="p-2.5">' +
+                '<h3 class="text-sm font-semibold truncate group-hover:text-red-500 transition">' + title + '</h3>' +
+                '<p class="text-xs text-gray-400 uppercase mt-0.5">' + mediaType + '</p>' +
+                '</div></div>';
+        }
+
+        async function openPlayer(id, type, title, itemData) {
+            const modal = document.getElementById('player-modal');
+            const iframe = document.getElementById('video-iframe');
+            document.getElementById('modal-title').innerText = title;
+            modal.classList.remove('hidden');
+
+            const videos = await fetchData('/' + type + '/' + id + '/videos');
+            const trailer = (videos && videos.results) ? (videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube') || videos.results[0]) : null;
+
+            if (trailer) {
+                iframe.src = 'https://youtube.com' + trailer.key + '?autoplay=1';
+            } else {
+                iframe.src = '';
+                alert('দুঃখিত, এই মুভিটির কোনো ট্রেইলার পাওয়া যায়নি।');
+            }
+
+            const parsedItem = typeof itemData === 'string' ? JSON.parse(decodeURIComponent(itemData)) : itemData;
+            document.getElementById('modal-list-btn').onclick = () => toggleWatchlist(parsedItem);
+        }
+
+        function closeModal() {
+            document.getElementById('player-modal').classList.add('hidden');
+            document.getElementById('video-iframe').src = '';
+        }
+
+        let searchTimeout;
+        function handleSearch(event) {
+            clearTimeout(searchTimeout);
+            const query = event.target.value.trim();
+            if (query.length < 2) {
+                if (query.length === 0) resetHome();
+                return;
+            }
+            searchTimeout = setTimeout(async () => {
+                const data = await fetchData('/search/multi?query=' + encodeURIComponent(query));
+                showGrid('Search Results for "' + query + '"', data.results);
+            }, 500);
+        }
+
+        async function fetchCategory(endpoint, title) {
+            const data = await fetchData('/' + endpoint);
+            showGrid(title, data.results);
+        }
+
+        function showGrid(title, items) {
+            document.getElementById('hero-section').classList.add('hidden');
+            document.getElementById('sections-container').classList.add('hidden');
+            const gridContainer = document.getElementById('grid-container');
+            gridContainer.classList.remove('hidden');
+            document.getElementById('grid-title').innerText = title;
+            document.getElementById('grid-items').innerHTML = items.map(item => createCardHTML(item)).join('');
+        }
+
+        function resetHome() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('grid-container').classList.add('hidden');
+            document.getElementById('hero-section').classList.remove('hidden');
+            document.getElementById('sections-container').classList.remove('hidden');
+        }
+
+        function toggleWatchlist(item) {
+            const exists = watchlist.some(w => w.id === item.id);
+            if (exists) {
+                watchlist = watchlist.filter(w => w.id !== item.id);
+                alert('Removed from My List');
+            } else {
+                watchlist.push(item);
+                alert('Added to My List!');
+            }
+            localStorage.setItem('myWatchlist', JSON.stringify(watchlist));
+            updateWatchlistCount();
+        }
+
+        function updateWatchlistCount() {
+            document.getElementById('list-count').innerText = watchlist.length;
+        }
+
+        function showWatchlist() {
+            showGrid('My Watchlist', watchlist);
+        }
+    </script>
+</body>
+</html>
