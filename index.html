@@ -3,157 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STREAMHUB - Movie & TV Discovery</title>
+    <title>STREAMHUB - Stream Without Limits</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #0b0c10; color: #ffffff; overflow-x: hidden; }
+        body { background-color: #090a0f; color: #ffffff; overflow-x: hidden; padding-bottom: 75px; }
         
-        /* Navbar */
-        nav { position: fixed; top: 0; width: 100%; z-index: 100; background: rgba(11, 12, 16, 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid #1f2833; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .logo { font-size: 22px; font-weight: 900; color: #e50914; text-decoration: none; letter-spacing: 1px; }
-        .logo span { color: #ffffff; }
-        .nav-links { display: flex; gap: 15px; }
-        .nav-links button { background: none; border: none; color: #c5c6c7; font-size: 14px; font-weight: 600; cursor: pointer; }
-        .nav-links button:hover { color: #ffffff; }
-        .search-box input { background: #1f2833; border: 1px solid #45a29e; color: #fff; padding: 7px 15px; border-radius: 20px; font-size: 14px; outline: none; width: 200px; }
+        nav.top-nav { position: fixed; top: 0; width: 100%; z-index: 100; background: rgba(9, 10, 15, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #1e222d; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .brand-icon { background: #e50914; color: #fff; width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; }
+        .brand-text h1 { font-size: 18px; font-weight: 900; color: #e50914; letter-spacing: 0.5px; line-height: 1; }
+        .brand-text span { font-size: 9px; color: #9ca3af; letter-spacing: 1.5px; display: block; margin-top: 2px; }
+        .search-box input { background: #161922; border: 1px solid #2d3343; color: #fff; padding: 8px 14px; border-radius: 20px; font-size: 13px; outline: none; width: 165px; transition: 0.2s; }
+        .search-box input:focus { border-color: #e50914; width: 210px; }
 
-        /* Hero Section */
-        #hero-section { position: relative; height: 75vh; width: 100%; background-size: cover; background-position: center; display: flex; align-items: flex-end; padding: 40px 24px; margin-top: 50px; }
-        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #0b0c10 10%, rgba(11,12,16,0.5) 60%, rgba(11,12,16,0.2) 100%); }
-        .hero-content { position: relative; z-index: 10; max-width: 650px; }
-        .badge { background: #e50914; color: #fff; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; }
-        #hero-title { font-size: 36px; font-weight: 800; margin: 10px 0; line-height: 1.2; }
-        .hero-meta { display: flex; gap: 15px; font-size: 14px; color: #66fcf1; font-weight: bold; margin-bottom: 12px; }
-        #hero-overview { color: #d1d5db; font-size: 14px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 20px; }
-        .hero-btns { display: flex; gap: 12px; }
-        .btn-play { background: #e50914; color: #fff; border: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        .btn-list { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid #666; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .genre-bar { position: fixed; top: 58px; width: 100%; z-index: 90; background: rgba(9, 10, 15, 0.9); backdrop-filter: blur(8px); padding: 10px 20px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid #161922; }
+        .genre-bar::-webkit-scrollbar { display: none; }
+        .chip { background: #161922; color: #d1d5db; border: 1px solid #2d3343; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .chip.active, .chip:hover { background: #e50914; color: #fff; border-color: #e50914; }
 
-        /* Movie Rows & Cards */
-        #sections-container { padding: 20px 24px; }
-        .row { margin-bottom: 35px; }
-        .row h2 { font-size: 20px; margin-bottom: 15px; color: #fff; border-left: 4px solid #e50914; padding-left: 10px; }
-        .row-cards { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        #hero-section { position: relative; min-height: 75vh; width: 100%; background-size: cover; background-position: center top; display: flex; align-items: flex-end; padding: 30px 20px; margin-top: 102px; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #090a0f 8%, rgba(9,10,15,0.6) 55%, rgba(9,10,15,0.2) 100%); }
+        .hero-content { position: relative; z-index: 10; max-width: 650px; width: 100%; }
+        .hero-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .badge-red { background: #e50914; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; }
+        .badge-green { background: #10b981; color: #000; font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 6px; }
+        .badge-dark { background: rgba(255,255,255,0.12); color: #e5e7eb; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
+        .badge-rating { color: #facc15; font-size: 13px; font-weight: bold; }
+        #hero-title { font-size: 32px; font-weight: 900; margin-bottom: 10px; line-height: 1.15; }
+        #hero-overview { color: #d1d5db; font-size: 13.5px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 20px; }
+        .hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-red { background: #e50914; color: #fff; border: none; padding: 11px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13.5px; display: flex; align-items: center; gap: 8px; }
+        .btn-glass { background: rgba(30, 34, 45, 0.85); color: #fff; border: 1px solid #374151; padding: 11px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 13.5px; display: flex; align-items: center; gap: 8px; }
+        #sections-container { padding: 15px 20px; }
+        .row { margin-bottom: 32px; }
+        .row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .row-header h2 { font-size: 18.5px; font-weight: 800; border-left: 4px solid #e50914; padding-left: 10px; }
+        .row-cards { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
         .row-cards::-webkit-scrollbar { display: none; }
-        
-        .card { min-width: 155px; max-width: 155px; background: #1f2833; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; position: relative; }
-        .card:hover { transform: scale(1.05); }
-        .card img { width: 100%; height: 230px; object-fit: cover; display: block; }
-        .card-rating { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #facc15; font-size: 11px; font-weight: bold; padding: 3px 6px; border-radius: 4px; }
-        .card-info { padding: 10px; }
-        .card-title { font-size: 13px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-type { font-size: 11px; color: #9ca3af; text-transform: uppercase; margin-top: 3px; }
 
-        /* Grid View */
-        #grid-container { padding: 80px 24px 30px; display: none; }
-        .grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        #grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+        .card { min-width: 155px; max-width: 155px; height: 235px; background: #161922; border-radius: 12px; overflow: hidden; cursor: pointer; position: relative; border: 1px solid #1f2430; }
+        .card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: 0.3s; }
+        .card-top-badges { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; justify-content: space-between; z-index: 2; }
+        .card-rating { background: rgba(0,0,0,0.85); color: #facc15; font-size: 11px; font-weight: bold; padding: 3px 7px; border-radius: 6px; }
+        .card-type { background: rgba(0,0,0,0.85); color: #fff; font-size: 10px; font-weight: bold; padding: 3px 7px; border-radius: 6px; text-transform: uppercase; }
+        .card-free { background: #10b981; color: #000; font-size: 10px; font-weight: 900; padding: 3px 7px; border-radius: 6px; }
+
+        .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(9,10,15,0.98) 18%, rgba(9,10,15,0.5) 65%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; opacity: 0; transition: 0.25s; z-index: 3; }
+        .card:hover .card-overlay, .card:active .card-overlay { opacity: 1; }
+        .card:hover img { transform: scale(1.06); }
+        .overlay-title { font-size: 13px; font-weight: 800; margin-bottom: 3px; line-height: 1.2; }
+        .overlay-meta { font-size: 11px; color: #9ca3af; margin-bottom: 10px; }
+        .overlay-btns { display: flex; gap: 6px; }
+        .ov-play { flex: 1; background: #e50914; color: #fff; border: none; padding: 7px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .ov-add { background: #262b38; color: #fff; border: 1px solid #4b5563; width: 32px; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; }
+
+        #player-view { display: none; padding: 115px 20px 30px; max-width: 900px; margin: 0 auto; }
+        .player-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: #161922; padding: 12px 16px; border-radius: 12px; border: 1px solid #262b38; }
+        .server-box { background: #161922; padding: 16px; border-radius: 12px; border: 1px solid #262b38; margin-bottom: 16px; }
+        .server-label { font-size: 12px; color: #9ca3af; margin-bottom: 10px; font-weight: bold; }
+        .server-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+        .srv-btn { background: #222736; color: #e5e7eb; border: 1px solid #32394d; padding: 9px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+        .srv-btn.active { background: #e50914; color: #fff; border-color: #e50914; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid #262b38; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        #grid-container { padding: 115px 20px 30px; display: none; }
+        #grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
         #grid-items .card { min-width: 100%; max-width: 100%; }
 
-        /* Player Modal */
-        #player-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 200; display: none; align-items: center; justify-content: center; padding: 15px; }
-        .modal-box { background: #1f2833; width: 100%; max-width: 800px; border-radius: 10px; overflow: hidden; }
-        .modal-header { padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; }
-        .close-btn { background: none; border: none; color: #fff; font-size: 26px; cursor: pointer; }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .modal-footer { padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #9ca3af; }
-
-        footer { border-top: 1px solid #1f2833; padding: 25px; text-align: center; color: #6b7280; font-size: 12px; margin-top: 40px; }
+        nav.bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0d0f17; border-top: 1px solid #1e222d; display: flex; justify-content: space-around; padding: 10px 5px; z-index: 150; }
+        .b-nav-item { background: none; border: none; color: #9ca3af; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .b-nav-item.active, .b-nav-item:hover { color: #e50914; }
+        .b-nav-icon { font-size: 17px; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="#" onclick="resetHome()" class="logo">STREAM<span>HUB</span></a>
-        <div class="nav-links">
-            <button onclick="resetHome()">Home</button>
-            <button onclick="fetchCategory('movie/popular', 'Popular Movies')">Movies</button>
-            <button onclick="fetchCategory('tv/popular', 'TV Series')">Series</button>
-            <button onclick="showWatchlist()">My List (<span id="list-count">0</span>)</button>
-        </div>
+    <nav class="top-nav">
+        <a href="#" onclick="resetHome()" class="brand">
+            <div class="brand-icon">▶</div>
+            <div class="brand-text">
+                <h1>STREAMHUB</h1>
+                <span>STREAM WITHOUT LIMITS</span>
+            </div>
+        </a>
         <div class="search-box">
-            <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="Search movies...">
+            <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="Search movies, series...">
         </div>
     </nav>
+
+    <div class="genre-bar">
+        <button class="chip active" onclick="selectGenre(this, 'all')">All</button>
+        <button class="chip" onclick="selectGenre(this, '28')">Action</button>
+        <button class="chip" onclick="selectGenre(this, '35')">Comedy</button>
+        <button class="chip" onclick="selectGenre(this, '878')">Sci-Fi</button>
+        <button class="chip" onclick="selectGenre(this, '27')">Horror</button>
+        <button class="chip" onclick="selectGenre(this, '16')">Animation</button>
+        <button class="chip" onclick="selectGenre(this, '10749')">Romance</button>
+    </div>
 
     <section id="hero-section">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <span class="badge">Trending #1</span>
-            <h1 id="hero-title">Loading Movies...</h1>
-            <div class="hero-meta">
-                <span id="hero-rating">★ 0.0</span>
-                <span id="hero-date">2026</span>
-                <span>HD</span>
+            <div class="hero-badges">
+                <span class="badge-red">🔥 FEATURED #1</span>
+                <span id="hero-type" class="badge-dark">MOVIE</span>
+                <span id="hero-rating" class="badge-rating">★ 0.0</span>
+                <span id="hero-date" class="badge-dark">2026</span>
+                <span class="badge-dark">4K UHD</span>
             </div>
-            <p id="hero-overview">Please wait while we fetch the latest movies...</p>
+            <h1 id="hero-title">Loading...</h1>
+            <p id="hero-overview">Fetching latest titles...</p>
             <div class="hero-btns">
-                <button id="hero-watch-btn" class="btn-play">▶ Watch Trailer</button>
-                <button id="hero-list-btn" class="btn-list">+ My List</button>
+                <button id="hero-watch-btn" class="btn-red">▶ Watch Now</button>
+                <button id="hero-list-btn" class="btn-glass">+ My List</button>
             </div>
         </div>
     </section>
 
-    <div id="sections-container"></div>
+    <div id="sections-container">
+        <div id="continue-row" class="row" style="display: none;">
+            <div class="row-header">
+                <h2>Continue Watching</h2>
+                <button onclick="clearHistory()" style="background:none; border:none; color:#ef4444; font-size:12px; cursor:pointer;">Clear</button>
+            </div>
+            <div id="continue-cards" class="row-cards"></div>
+        </div>
+
+        <div class="row">
+            <div class="row-header">
+                <h2>🎞️ Free Full Movies (Public Domain)</h2>
+                <span class="badge-green">FULL LENGTH</span>
+            </div>
+            <div id="free-movies-cards" class="row-cards"></div>
+        </div>
+
+        <div id="dynamic-rows"></div>
+    </div>
+
+    <div id="player-view">
+        <div class="player-top-bar">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span id="p-badge" class="badge-red">MOVIE</span>
+                <h2 id="p-title" style="font-size:17px; font-weight:800;">Movie Title</h2>
+            </div>
+            <button onclick="closePlayer()" class="btn-glass" style="padding:6px 14px; font-size:12.5px;">✕ Close</button>
+        </div>
+
+        <div class="server-box">
+            <div class="server-label">📡 Select Stream Source:</div>
+            <div id="server-buttons" class="server-grid"></div>
+        </div>
+
+        <div class="video-container">
+            <iframe id="video-iframe" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <p id="p-overview" style="color:#9ca3af; font-size:13.5px; line-height:1.6; margin-top:16px;"></p>
+    </div>
 
     <div id="grid-container">
-        <div class="grid-header">
+        <div class="row-header">
             <h2 id="grid-title">Results</h2>
-            <button onclick="resetHome()" class="btn-play" style="padding: 6px 14px; font-size: 13px;">Back Home</button>
+            <button onclick="resetHome()" class="btn-red" style="padding: 6px 14px; font-size: 12px;">Back Home</button>
         </div>
         <div id="grid-items"></div>
     </div>
 
-    <div id="player-modal">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3 id="modal-title" style="font-size: 16px;">Trailer</h3>
-                <button onclick="closeModal()" class="close-btn">&times;</button>
-            </div>
-            <div class="video-wrapper">
-                <iframe id="video-iframe" src="" frameborder="0" allowfullscreen></iframe>
-            </div>
-            <div class="modal-footer">
-                <span>Official YouTube Trailer</span>
-                <button id="modal-list-btn" class="btn-list" style="padding: 5px 12px; font-size: 12px;">+ Add to My List</button>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <p style="color: #fff; font-weight: bold; margin-bottom: 5px;">STREAMHUB • Movie & TV Discovery</p>
-        <p>Powered by TMDB API. Trailers streamed via YouTube.</p>
-    </footer>
-    <script>
+    <nav class="bottom-nav">
+        <button class="b-nav-item active" onclick="resetHome()"><span class="b-nav-icon">🏠</span>Home</button>
+        <button class="b-nav-item" onclick="fetchCategory('movie/popular', 'Popular Movies')"><span class="b-nav-icon">🎬</span>Movies</button>
+        <button class="b-nav-item" onclick="fetchCategory('tv/popular', 'Top TV Series')"><span class="b-nav-icon">📺</span>Series</button>
+        <button class="b-nav-item" onclick="showFreeFullGrid()"><span class="b-nav-icon">🎞️</span>Full Free</button>
+        <button class="b-nav-item" onclick="showWatchlist()"><span class="b-nav-icon">🔖</span>My List (<span id="list-count">0</span>)</button>
+    </nav>
+        <script>
         const API_KEY = '55a539170381681f8819be75900765d2';
         const BASE_URL = 'https://api.themoviedb.org/3';
         const IMG_URL = 'https://image.tmdb.org/t/p/w500';
         const BACKDROP_URL = 'https://image.tmdb.org/t/p/original';
 
+        const FREE_FULL_MOVIES = [
+            { id: 'night_living_dead', title: 'Night of the Living Dead', year: '1968', rating: '7.8', isFreeFull: true, archiveId: 'night_of_the_living_dead', poster: 'https://archive.org', overview: 'A ragtag group of Pennsylvanians barricade themselves in an old farmhouse to remain safe from a horde of flesh-eating ghouls.' },
+            { id: 'charade_1963', title: 'Charade (Full Movie)', year: '1963', rating: '7.9', isFreeFull: true, archiveId: 'Charade_1963', poster: 'https://archive.org', overview: 'Romance and suspense ensue in Paris as a woman is pursued by several men who want a fortune her murdered husband had stolen.' },
+            { id: 'his_girl_friday', title: 'His Girl Friday', year: '1940', rating: '7.9', isFreeFull: true, archiveId: 'his_girl_friday', poster: 'https://archive.org', overview: 'A newspaper editor uses every trick in the book to keep his ace reporter ex-wife from remarrying.' },
+            { id: 'plan_9_space', title: 'Plan 9 from Outer Space', year: '1959', rating: '4.0', isFreeFull: true, archiveId: 'Plan_9_from_Outer_Space_1959', poster: 'https://archive.org', overview: 'Evil aliens attack Earth and set their terrible Plan 9 into action by resurrecting the dead.' },
+            { id: 'nosferatu_1922', title: 'Nosferatu (Classic)', year: '1922', rating: '7.9', isFreeFull: true, archiveId: 'Nosferatu_1922', poster: 'https://archive.org', overview: 'Vampire Count Orlok expresses interest in a new residence and real estate agent Hutter wife.' }
+        ];
+
         let watchlist = JSON.parse(localStorage.getItem('myWatchlist')) || [];
+        let historyList = JSON.parse(localStorage.getItem('continueWatching')) || [];
 
         document.addEventListener('DOMContentLoaded', function() {
             updateWatchlistCount();
+            renderContinueWatching();
+            renderFreeMovies();
             loadHomePage();
         });
+
+        function renderFreeMovies() {
+            const container = document.getElementById('free-movies-cards');
+            let html = '';
+            for (let i = 0; i < FREE_FULL_MOVIES.length; i++) {
+                html += createCardHTML(FREE_FULL_MOVIES.at(i));
+            }
+            container.innerHTML = html;
+        }
 
         async function loadHomePage() {
             const trending = await fetchData('/trending/all/day');
             if (trending && trending.results && trending.results.length > 0) {
-                const firstItem = trending.results.shift();
-                setupHero(firstItem);
+                setupHero(trending.results.at(0));
             }
 
-            const container = document.getElementById('sections-container');
+            const container = document.getElementById('dynamic-rows');
             container.innerHTML = '';
 
             const categories = [
                 { title: 'Trending Now', endpoint: '/trending/all/week' },
                 { title: 'Popular Movies', endpoint: '/movie/popular' },
                 { title: 'Top Rated TV Series', endpoint: '/tv/top_rated' },
-                { title: 'Action & Sci-Fi', endpoint: '/discover/movie?with_genres=28,878' },
-                { title: 'Anime & Animation', endpoint: '/discover/tv?with_genres=16' }
+                { title: 'Action & Sci-Fi Blockbusters', endpoint: '/discover/movie?with_genres=28,878' },
+                { title: 'Top Anime & Animation', endpoint: '/discover/tv?with_genres=16' }
             ];
 
             for (let i = 0; i < categories.length; i++) {
@@ -170,7 +240,6 @@
                 const res = await fetch(BASE_URL + endpoint + sep + 'api_key=' + API_KEY);
                 return await res.json();
             } catch (err) {
-                console.error(err);
                 return null;
             }
         }
@@ -178,76 +247,159 @@
         function setupHero(item) {
             const hero = document.getElementById('hero-section');
             const title = item.title || item.name;
-            const dateStr = item.release_date || item.first_air_date || '';
-            const year = dateStr.substring(0, 4);
+            const year = (item.release_date || item.first_air_date || '').substring(0, 4);
             const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
 
             if (item.backdrop_path) {
                 hero.style.backgroundImage = "url('" + BACKDROP_URL + item.backdrop_path + "')";
             }
             document.getElementById('hero-title').innerText = title;
+            document.getElementById('hero-type').innerText = mediaType.toUpperCase();
             document.getElementById('hero-rating').innerText = '★ ' + (item.vote_average ? item.vote_average.toFixed(1) : '8.0');
             document.getElementById('hero-date').innerText = year;
             document.getElementById('hero-overview').innerText = item.overview || '';
 
-            document.getElementById('hero-watch-btn').onclick = function() { openPlayer(item.id, mediaType, title, item); };
+            document.getElementById('hero-watch-btn').onclick = function() { openPlayerView(item); };
             document.getElementById('hero-list-btn').onclick = function() { toggleWatchlist(item); };
         }
-
-        function renderRow(title, items, container) {
+                    function renderRow(title, items, container) {
             const section = document.createElement('div');
             section.className = 'row';
             let cardsHTML = '';
             for (let i = 0; i < items.length; i++) {
                 cardsHTML += createCardHTML(items.at(i));
             }
-            section.innerHTML = '<h2>' + title + '</h2><div class="row-cards">' + cardsHTML + '</div>';
+            section.innerHTML = '<div class="row-header"><h2>' + title + '</h2></div><div class="row-cards">' + cardsHTML + '</div>';
             container.appendChild(section);
         }
 
         function createCardHTML(item) {
-            if (!item || !item.poster_path) return '';
+            if (!item) return '';
+            if (!item.poster_path && !item.poster) return '';
             const title = item.title || item.name;
-            const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
-            const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
-            const itemString = encodeURIComponent(JSON.stringify(item));
-            const safeTitle = title.replace(/'/g, "\\'");
+            const year = item.year || (item.release_date || item.first_air_date || '').substring(0, 4);
+            const mediaType = item.isFreeFull ? 'FULL HD' : (item.media_type || (item.title ? 'movie' : 'tv'));
+            const rating = item.rating || (item.vote_average ? item.vote_average.toFixed(1) : 'N/A');
+            const imgSrc = item.poster ? item.poster : (IMG_URL + item.poster_path);
+            const itemStr = encodeURIComponent(JSON.stringify(item));
 
-            return '<div class="card" onclick="openPlayer(' + item.id + ', \'' + mediaType + '\', \'' + safeTitle + '\', \'' + itemString + '\')">' +
-                '<img src="' + IMG_URL + item.poster_path + '" alt="' + safeTitle + '">' +
-                '<div class="card-rating">★ ' + rating + '</div>' +
-                '<div class="card-info">' +
-                '<div class="card-title">' + title + '</div>' +
-                '<div class="card-type">' + mediaType + '</div>' +
-                '</div></div>';
+            return '<div class="card">' +
+                '<img src="' + imgSrc + '" alt="' + title + '">' +
+                '<div class="card-top-badges">' +
+                '<span class="card-rating">★ ' + rating + '</span>' +
+                (item.isFreeFull ? '<span class="card-free">FREE FULL</span>' : '<span class="card-type">' + mediaType + '</span>') +
+                '</div>' +
+                '<div class="card-overlay">' +
+                '<div class="overlay-title">' + title + '</div>' +
+                '<div class="overlay-meta">' + year + ' • ' + mediaType.toUpperCase() + '</div>' +
+                '<div class="overlay-btns">' +
+                '<button class="ov-play" onclick="handleCardPlay(\'' + itemStr + '\')">▶ Play</button>' +
+                '<button class="ov-add" onclick="handleCardAdd(\'' + itemStr + '\')">+</button>' +
+                '</div></div></div>';
         }
 
-        async function openPlayer(id, type, title, itemData) {
-            const modal = document.getElementById('player-modal');
+        function handleCardPlay(itemStr) {
+            const item = JSON.parse(decodeURIComponent(itemStr));
+            openPlayerView(item);
+        }
+
+        function handleCardAdd(itemStr) {
+            const item = JSON.parse(decodeURIComponent(itemStr));
+            toggleWatchlist(item);
+        }
+
+        async function openPlayerView(item) {
+            saveToHistory(item);
+            const title = item.title || item.name;
+            const mediaType = item.isFreeFull ? 'FULL MOVIE' : (item.media_type || (item.title ? 'movie' : 'tv'));
+
+            document.getElementById('hero-section').style.display = 'none';
+            document.getElementById('sections-container').style.display = 'none';
+            document.getElementById('grid-container').style.display = 'none';
+            
+            const pView = document.getElementById('player-view');
+            pView.style.display = 'block';
+            window.scrollTo(0, 0);
+
+            document.getElementById('p-badge').innerText = mediaType.toUpperCase();
+            document.getElementById('p-title').innerText = title;
+            document.getElementById('p-overview').innerText = item.overview || '';
+
+            const srvBox = document.getElementById('server-buttons');
             const iframe = document.getElementById('video-iframe');
-            document.getElementById('modal-title').innerText = title;
-            modal.style.display = 'flex';
+            iframe.src = '';
 
-            const videos = await fetchData('/' + type + '/' + id + '/videos');
-            let trailer = null;
-            if (videos && videos.results && videos.results.length > 0) {
-                trailer = videos.results.find(function(v) { return v.type === 'Trailer' && v.site === 'YouTube'; }) || videos.results.at(0);
+            if (item.isFreeFull) {
+                srvBox.innerHTML = '<button class="srv-btn active">▶ Server 1 (Internet Archive Full HD)</button>';
+                iframe.src = 'https://archive.org' + item.archiveId;
+                return;
             }
 
-            if (trailer && trailer.key) {
-                iframe.src = 'https://youtube.com' + trailer.key + '?autoplay=1';
+            srvBox.innerHTML = '<span style="color:#9ca3af; font-size:13px;">Loading streams...</span>';
+            const videos = await fetchData('/' + mediaType + '/' + item.id + '/videos');
+            const ytVideos = (videos && videos.results) ? videos.results.filter(function(v) { return v.site === 'YouTube'; }) : [];
+
+            srvBox.innerHTML = '';
+            if (ytVideos.length > 0) {
+                ytVideos.slice(0, 5).forEach(function(vid, idx) {
+                    const btn = document.createElement('button');
+                    btn.className = 'srv-btn' + (idx === 0 ? ' active' : '');
+                    btn.innerText = '▶ Server ' + (idx + 1) + ' (' + vid.type + ')';
+                    btn.onclick = function() {
+                        document.querySelectorAll('.srv-btn').forEach(function(b) { b.classList.remove('active'); });
+                        btn.classList.add('active');
+                        iframe.src = 'https://youtube.com' + vid.key + '?autoplay=1';
+                    };
+                    srvBox.appendChild(btn);
+                });
+                iframe.src = 'https://youtube.com' + ytVideos.at(0).key + '?autoplay=1';
             } else {
-                iframe.src = '';
-                alert('দুঃখিত, এই মুভিটির ট্রেইলার পাওয়া যায়নি।');
+                srvBox.innerHTML = '<span style="color:#ef4444; font-size:13px;">No official trailer stream available for this title.</span>';
             }
-
-            const parsedItem = typeof itemData === 'string' ? JSON.parse(decodeURIComponent(itemData)) : itemData;
-            document.getElementById('modal-list-btn').onclick = function() { toggleWatchlist(parsedItem); };
         }
 
-        function closeModal() {
-            document.getElementById('player-modal').style.display = 'none';
+        function closePlayer() {
             document.getElementById('video-iframe').src = '';
+            resetHome();
+        }
+
+        function saveToHistory(item) {
+            historyList = historyList.filter(function(h) { return h.id !== item.id; });
+            historyList.unshift(item);
+            if (historyList.length > 10) historyList.pop();
+            localStorage.setItem('continueWatching', JSON.stringify(historyList));
+            renderContinueWatching();
+        }
+
+        function renderContinueWatching() {
+            const row = document.getElementById('continue-row');
+            const container = document.getElementById('continue-cards');
+            if (historyList.length === 0) {
+                row.style.display = 'none';
+                return;
+            }
+            row.style.display = 'block';
+            let html = '';
+            for (let i = 0; i < historyList.length; i++) {
+                html += createCardHTML(historyList.at(i));
+            }
+            container.innerHTML = html;
+        }
+
+        function clearHistory() {
+            historyList = [];
+            localStorage.removeItem('continueWatching');
+            renderContinueWatching();
+        }
+
+        function selectGenre(btn, genreId) {
+            document.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
+            btn.classList.add('active');
+            if (genreId === 'all') {
+                resetHome();
+            } else {
+                fetchCategory('discover/movie?with_genres=' + genreId, btn.innerText + ' Movies');
+            }
         }
 
         let searchTimeout;
@@ -260,37 +412,41 @@
             }
             searchTimeout = setTimeout(async function() {
                 const data = await fetchData('/search/multi?query=' + encodeURIComponent(query));
-                if (data && data.results) {
-                    showGrid('Search: ' + query, data.results);
-                }
+                if (data && data.results) showGrid('Search: ' + query, data.results);
             }, 500);
         }
 
         async function fetchCategory(endpoint, title) {
             const data = await fetchData('/' + endpoint);
-            if (data && data.results) {
-                showGrid(title, data.results);
-            }
+            if (data && data.results) showGrid(title, data.results);
+        }
+
+        function showFreeFullGrid() {
+            showGrid('Free Full Length Movies', FREE_FULL_MOVIES);
         }
 
         function showGrid(title, items) {
             document.getElementById('hero-section').style.display = 'none';
             document.getElementById('sections-container').style.display = 'none';
-            const gridContainer = document.getElementById('grid-container');
-            gridContainer.style.display = 'block';
+            document.getElementById('player-view').style.display = 'none';
+            const grid = document.getElementById('grid-container');
+            grid.style.display = 'block';
             document.getElementById('grid-title').innerText = title;
             let html = '';
             for (let i = 0; i < items.length; i++) {
                 html += createCardHTML(items.at(i));
             }
             document.getElementById('grid-items').innerHTML = html;
+            window.scrollTo(0, 0);
         }
 
         function resetHome() {
             document.getElementById('searchInput').value = '';
             document.getElementById('grid-container').style.display = 'none';
+            document.getElementById('player-view').style.display = 'none';
             document.getElementById('hero-section').style.display = 'flex';
             document.getElementById('sections-container').style.display = 'block';
+            window.scrollTo(0, 0);
         }
 
         function toggleWatchlist(item) {
