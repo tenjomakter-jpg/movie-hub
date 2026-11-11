@@ -1,118 +1,139 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STREAMHUB - Movie & TV Series Discovery</title>
-    <script src="https://tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cloudflare.com">
+    <title>STREAMHUB - Movie & TV Discovery</title>
     <style>
-        body { background-color: #0b0c10; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .hero-gradient { background: linear-gradient(to top, #0b0c10 10%, rgba(11, 12, 16, 0.6) 50%, rgba(11, 12, 16, 0.2) 100%); }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #0b0c10; color: #ffffff; overflow-x: hidden; }
+        
+        /* Navbar */
+        nav { position: fixed; top: 0; width: 100%; z-index: 100; background: rgba(11, 12, 16, 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid #1f2833; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .logo { font-size: 22px; font-weight: 900; color: #e50914; text-decoration: none; letter-spacing: 1px; }
+        .logo span { color: #ffffff; }
+        .nav-links { display: flex; gap: 15px; }
+        .nav-links button { background: none; border: none; color: #c5c6c7; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .nav-links button:hover { color: #ffffff; }
+        .search-box input { background: #1f2833; border: 1px solid #45a29e; color: #fff; padding: 7px 15px; border-radius: 20px; font-size: 14px; outline: none; width: 200px; }
+
+        /* Hero Section */
+        #hero-section { position: relative; height: 75vh; width: 100%; background-size: cover; background-position: center; display: flex; align-items: flex-end; padding: 40px 24px; margin-top: 50px; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to top, #0b0c10 10%, rgba(11,12,16,0.5) 60%, rgba(11,12,16,0.2) 100%); }
+        .hero-content { position: relative; z-index: 10; max-width: 650px; }
+        .badge { background: #e50914; color: #fff; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; }
+        #hero-title { font-size: 36px; font-weight: 800; margin: 10px 0; line-height: 1.2; }
+        .hero-meta { display: flex; gap: 15px; font-size: 14px; color: #66fcf1; font-weight: bold; margin-bottom: 12px; }
+        #hero-overview { color: #d1d5db; font-size: 14px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 20px; }
+        .hero-btns { display: flex; gap: 12px; }
+        .btn-play { background: #e50914; color: #fff; border: none; padding: 10px 22px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .btn-list { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid #666; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
+
+        /* Movie Rows & Cards */
+        #sections-container { padding: 20px 24px; }
+        .row { margin-bottom: 35px; }
+        .row h2 { font-size: 20px; margin-bottom: 15px; color: #fff; border-left: 4px solid #e50914; padding-left: 10px; }
+        .row-cards { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .row-cards::-webkit-scrollbar { display: none; }
+        
+        .card { min-width: 155px; max-width: 155px; background: #1f2833; border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.2s; position: relative; }
+        .card:hover { transform: scale(1.05); }
+        .card img { width: 100%; height: 230px; object-fit: cover; display: block; }
+        .card-rating { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.85); color: #facc15; font-size: 11px; font-weight: bold; padding: 3px 6px; border-radius: 4px; }
+        .card-info { padding: 10px; }
+        .card-title { font-size: 13px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-type { font-size: 11px; color: #9ca3af; text-transform: uppercase; margin-top: 3px; }
+
+        /* Grid View */
+        #grid-container { padding: 80px 24px 30px; display: none; }
+        .grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #grid-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+        #grid-items .card { min-width: 100%; max-width: 100%; }
+
+        /* Player Modal */
+        #player-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 200; display: none; align-items: center; justify-content: center; padding: 15px; }
+        .modal-box { background: #1f2833; width: 100%; max-width: 800px; border-radius: 10px; overflow: hidden; }
+        .modal-header { padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; }
+        .close-btn { background: none; border: none; color: #fff; font-size: 26px; cursor: pointer; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .modal-footer { padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #9ca3af; }
+
+        footer { border-top: 1px solid #1f2833; padding: 25px; text-align: center; color: #6b7280; font-size: 12px; margin-top: 40px; }
     </style>
 </head>
-<body class="overflow-x-hidden">
+<body>
 
-    <!-- Navbar -->
-    <nav class="fixed top-0 w-full z-50 bg-[#0b0c10]/90 backdrop-blur-md border-b border-gray-800 px-4 md:px-10 py-3 flex justify-between items-center">
-        <div class="flex items-center space-x-6">
-            <a href="#" onclick="resetHome()" class="text-2xl font-extrabold tracking-wider text-red-600 flex items-center gap-2">
-                <i class="fa-solid fa-play-circle"></i> STREAM<span class="text-white">HUB</span>
-            </a>
-            <div class="hidden md:flex space-x-6 text-sm font-medium text-gray-300">
-                <button onclick="resetHome()" class="hover:text-white transition">Home</button>
-                <button onclick="fetchCategory('movie/popular', 'Popular Movies')" class="hover:text-white transition">Movies</button>
-                <button onclick="fetchCategory('tv/popular', 'Top TV Series')" class="hover:text-white transition">TV Series</button>
-                <button onclick="showWatchlist()" class="hover:text-white transition">My List (<span id="list-count">0</span>)</button>
-            </div>
+    <nav>
+        <a href="#" onclick="resetHome()" class="logo">STREAM<span>HUB</span></a>
+        <div class="nav-links">
+            <button onclick="resetHome()">Home</button>
+            <button onclick="fetchCategory('movie/popular', 'Popular Movies')">Movies</button>
+            <button onclick="fetchCategory('tv/popular', 'TV Series')">Series</button>
+            <button onclick="showWatchlist()">My List (<span id="list-count">0</span>)</button>
         </div>
-        
-        <!-- Search Bar -->
-        <div class="relative w-44 md:w-72">
-            <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="Search movies..." 
-                class="w-full bg-gray-900 text-sm text-white rounded-full pl-4 pr-10 py-2 border border-gray-700 focus:outline-none focus:border-red-600">
-            <i class="fa-solid fa-search absolute right-3.5 top-2.5 text-gray-400 text-sm"></i>
+        <div class="search-box">
+            <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="Search movies...">
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main id="main-content" class="pt-16">
-        
-        <!-- Hero Section -->
-        <section id="hero-section" class="relative h-[70vh] md:h-[80vh] w-full flex items-end pb-12 px-4 md:px-12 bg-cover bg-center">
-            <div class="absolute inset-0 hero-gradient"></div>
-            <div class="relative z-10 max-w-2xl space-y-4">
-                <span class="bg-red-600 text-xs font-bold px-2.5 py-1 rounded uppercase tracking-wider">Trending #1</span>
-                <h1 id="hero-title" class="text-3xl md:text-5xl font-extrabold leading-tight">Loading...</h1>
-                <div class="flex items-center space-x-4 text-sm text-gray-300">
-                    <span id="hero-rating" class="text-green-400 font-bold"><i class="fa-solid fa-star"></i> 0.0</span>
-                    <span id="hero-date">2026</span>
-                    <span class="border border-gray-500 px-1.5 py-0.5 text-xs rounded">4K UHD</span>
-                </div>
-                <p id="hero-overview" class="text-gray-300 text-sm md:text-base line-clamp-3">Fetching latest movies from TMDB...</p>
-                <div class="flex space-x-4 pt-2">
-                    <button id="hero-watch-btn" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center gap-2 transition">
-                        <i class="fa-solid fa-play"></i> Watch Trailer
-                    </button>
-                    <button id="hero-list-btn" class="bg-gray-800/80 hover:bg-gray-700 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center gap-2 border border-gray-600 transition">
-                        <i class="fa-solid fa-plus"></i> My List
-                    </button>
-                </div>
+    <section id="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="badge">Trending #1</span>
+            <h1 id="hero-title">Loading Movies...</h1>
+            <div class="hero-meta">
+                <span id="hero-rating">★ 0.0</span>
+                <span id="hero-date">2026</span>
+                <span>HD</span>
             </div>
-        </section>
-
-        <!-- Dynamic Sections Container -->
-        <div id="sections-container" class="px-4 md:px-12 py-8 space-y-10"></div>
-
-        <!-- Search / Grid View Container -->
-        <div id="grid-container" class="hidden px-4 md:px-12 py-8">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="grid-title" class="text-2xl font-bold">Search Results</h2>
-                <button onclick="resetHome()" class="text-sm text-red-500 hover:underline">Back to Home</button>
+            <p id="hero-overview">Please wait while we fetch the latest movies...</p>
+            <div class="hero-btns">
+                <button id="hero-watch-btn" class="btn-play">▶ Watch Trailer</button>
+                <button id="hero-list-btn" class="btn-list">+ My List</button>
             </div>
-            <div id="grid-items" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5"></div>
         </div>
+    </section>
 
-    </main>
+    <div id="sections-container"></div>
 
-    <!-- Video Player Modal -->
-    <div id="player-modal" class="fixed inset-0 z-50 hidden bg-black/95 flex items-center justify-center p-4">
-        <div class="relative w-full max-w-4xl bg-gray-900 rounded-xl overflow-hidden border border-gray-800 shadow-2xl">
-            <div class="flex justify-between items-center p-4 border-b border-gray-800">
-                <h3 id="modal-title" class="font-bold text-lg truncate">Movie Title</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+    <div id="grid-container">
+        <div class="grid-header">
+            <h2 id="grid-title">Results</h2>
+            <button onclick="resetHome()" class="btn-play" style="padding: 6px 14px; font-size: 13px;">Back Home</button>
+        </div>
+        <div id="grid-items"></div>
+    </div>
+
+    <div id="player-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modal-title" style="font-size: 16px;">Trailer</h3>
+                <button onclick="closeModal()" class="close-btn">&times;</button>
             </div>
-            <div class="aspect-video w-full bg-black flex items-center justify-center">
-                <iframe id="video-iframe" class="w-full h-full" src="" frameborder="0" allowfullscreen></iframe>
+            <div class="video-wrapper">
+                <iframe id="video-iframe" src="" frameborder="0" allowfullscreen></iframe>
             </div>
-            <div class="p-4 bg-gray-900 text-sm text-gray-400 flex justify-between items-center">
-                <span>Source: Official TMDB / YouTube Stream</span>
-                <button id="modal-list-btn" class="text-white bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded text-xs">
-                    + Add to Watchlist
-                </button>
+            <div class="modal-footer">
+                <span>Official YouTube Trailer</span>
+                <button id="modal-list-btn" class="btn-list" style="padding: 5px 12px; font-size: 12px;">+ Add to My List</button>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="border-t border-gray-800 mt-16 py-8 px-4 md:px-12 text-center text-gray-500 text-xs space-y-2">
-        <p class="text-gray-300 font-semibold text-sm">STREAMHUB • Open-Source Media Indexing Client</p>
-        <p>Disclaimer: This site does not host or store any video files on its servers. All metadata and trailers are provided by the TMDB API.</p>
-        <p>© 2026 STREAMHUB. Built with TMDB API.</p>
+    <footer>
+        <p style="color: #fff; font-weight: bold; margin-bottom: 5px;">STREAMHUB • Movie & TV Discovery</p>
+        <p>Powered by TMDB API. Trailers streamed via YouTube.</p>
     </footer>
-    <!-- JavaScript Logic -->
     <script>
-        const API_KEY = '55a539170381681f8819be75900765d2'; 
-
+        const API_KEY = '55a539170381681f8819be75900765d2';
         const BASE_URL = 'https://themoviedb.org';
         const IMG_URL = 'https://tmdb.org';
         const BACKDROP_URL = 'https://tmdb.org';
 
         let watchlist = JSON.parse(localStorage.getItem('myWatchlist')) || [];
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             updateWatchlistCount();
             loadHomePage();
         });
@@ -120,7 +141,8 @@
         async function loadHomePage() {
             const trending = await fetchData('/trending/all/day');
             if (trending && trending.results && trending.results.length > 0) {
-                setupHero(trending.results[0]);
+                const firstItem = trending.results.shift();
+                setupHero(firstItem);
             }
 
             const container = document.getElementById('sections-container');
@@ -130,25 +152,25 @@
                 { title: 'Trending Now', endpoint: '/trending/all/week' },
                 { title: 'Popular Movies', endpoint: '/movie/popular' },
                 { title: 'Top Rated TV Series', endpoint: '/tv/top_rated' },
-                { title: 'Action & Sci-Fi Blockbusters', endpoint: '/discover/movie?with_genres=28,878' },
-                { title: 'Top Anime & Animation', endpoint: '/discover/tv?with_genres=16' }
+                { title: 'Action & Sci-Fi', endpoint: '/discover/movie?with_genres=28,878' },
+                { title: 'Anime & Animation', endpoint: '/discover/tv?with_genres=16' }
             ];
 
-            for (let cat of categories) {
-                const data = await fetchData(cat.endpoint);
+            for (let i = 0; i < categories.length; i++) {
+                const data = await fetchData(categories.at(i).endpoint);
                 if (data && data.results) {
-                    renderRow(cat.title, data.results, container);
+                    renderRow(categories.at(i).title, data.results, container);
                 }
             }
         }
 
         async function fetchData(endpoint) {
-            const separator = endpoint.includes('?') ? '&' : '?';
+            const sep = endpoint.includes('?') ? '&' : '?';
             try {
-                const res = await fetch(BASE_URL + endpoint + separator + 'api_key=' + API_KEY);
+                const res = await fetch(BASE_URL + endpoint + sep + 'api_key=' + API_KEY);
                 return await res.json();
-            } catch (error) {
-                console.error('Error fetching data:', error);
+            } catch (err) {
+                console.error(err);
                 return null;
             }
         }
@@ -156,43 +178,47 @@
         function setupHero(item) {
             const hero = document.getElementById('hero-section');
             const title = item.title || item.name;
-            const date = (item.release_date || item.first_air_date || '').split('-')[0];
+            const dateStr = item.release_date || item.first_air_date || '';
+            const year = dateStr.substring(0, 4);
             const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
 
-            hero.style.backgroundImage = "url('" + BACKDROP_URL + item.backdrop_path + "')";
+            if (item.backdrop_path) {
+                hero.style.backgroundImage = "url('" + BACKDROP_URL + item.backdrop_path + "')";
+            }
             document.getElementById('hero-title').innerText = title;
-            document.getElementById('hero-rating').innerHTML = '<i class="fa-solid fa-star"></i> ' + item.vote_average.toFixed(1);
-            document.getElementById('hero-date').innerText = date;
-            document.getElementById('hero-overview').innerText = item.overview;
+            document.getElementById('hero-rating').innerText = '★ ' + (item.vote_average ? item.vote_average.toFixed(1) : '8.0');
+            document.getElementById('hero-date').innerText = year;
+            document.getElementById('hero-overview').innerText = item.overview || '';
 
-            document.getElementById('hero-watch-btn').onclick = () => openPlayer(item.id, mediaType, title, item);
-            document.getElementById('hero-list-btn').onclick = () => toggleWatchlist(item);
+            document.getElementById('hero-watch-btn').onclick = function() { openPlayer(item.id, mediaType, title, item); };
+            document.getElementById('hero-list-btn').onclick = function() { toggleWatchlist(item); };
         }
 
         function renderRow(title, items, container) {
             const section = document.createElement('div');
-            section.innerHTML = '<h2 class="text-xl md:text-2xl font-bold mb-4">' + title + '</h2>' +
-                '<div class="flex space-x-4 overflow-x-auto no-scrollbar pb-4">' +
-                items.map(item => createCardHTML(item)).join('') +
-                '</div>';
+            section.className = 'row';
+            let cardsHTML = '';
+            for (let i = 0; i < items.length; i++) {
+                cardsHTML += createCardHTML(items.at(i));
+            }
+            section.innerHTML = '<h2>' + title + '</h2><div class="row-cards">' + cardsHTML + '</div>';
             container.appendChild(section);
         }
 
         function createCardHTML(item) {
-            if (!item.poster_path) return '';
+            if (!item || !item.poster_path) return '';
             const title = item.title || item.name;
             const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
             const rating = item.vote_average ? item.vote_average.toFixed(1) : 'N/A';
             const itemString = encodeURIComponent(JSON.stringify(item));
             const safeTitle = title.replace(/'/g, "\\'");
 
-            return '<div onclick="openPlayer(' + item.id + ', \'' + mediaType + '\', \'' + safeTitle + '\', \'' + itemString + '\')" ' +
-                'class="min-w-[150px] md:min-w-[185px] cursor-pointer group relative rounded-lg overflow-hidden bg-gray-900 transition transform hover:scale-105">' +
-                '<img src="' + IMG_URL + item.poster_path + '" alt="' + safeTitle + '" class="w-full h-[225px] md:h-[275px] object-cover">' +
-                '<div class="absolute top-2 right-2 bg-black/80 text-yellow-400 text-xs font-bold px-2 py-1 rounded">★ ' + rating + '</div>' +
-                '<div class="p-2.5">' +
-                '<h3 class="text-sm font-semibold truncate group-hover:text-red-500 transition">' + title + '</h3>' +
-                '<p class="text-xs text-gray-400 uppercase mt-0.5">' + mediaType + '</p>' +
+            return '<div class="card" onclick="openPlayer(' + item.id + ', \'' + mediaType + '\', \'' + safeTitle + '\', \'' + itemString + '\')">' +
+                '<img src="' + IMG_URL + item.poster_path + '" alt="' + safeTitle + '">' +
+                '<div class="card-rating">★ ' + rating + '</div>' +
+                '<div class="card-info">' +
+                '<div class="card-title">' + title + '</div>' +
+                '<div class="card-type">' + mediaType + '</div>' +
                 '</div></div>';
         }
 
@@ -200,24 +226,27 @@
             const modal = document.getElementById('player-modal');
             const iframe = document.getElementById('video-iframe');
             document.getElementById('modal-title').innerText = title;
-            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
 
             const videos = await fetchData('/' + type + '/' + id + '/videos');
-            const trailer = (videos && videos.results) ? (videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube') || videos.results[0]) : null;
+            let trailer = null;
+            if (videos && videos.results && videos.results.length > 0) {
+                trailer = videos.results.find(function(v) { return v.type === 'Trailer' && v.site === 'YouTube'; }) || videos.results.at(0);
+            }
 
-            if (trailer) {
+            if (trailer && trailer.key) {
                 iframe.src = 'https://youtube.com' + trailer.key + '?autoplay=1';
             } else {
                 iframe.src = '';
-                alert('দুঃখিত, এই মুভিটির কোনো ট্রেইলার পাওয়া যায়নি।');
+                alert('দুঃখিত, এই মুভিটির ট্রেইলার পাওয়া যায়নি।');
             }
 
             const parsedItem = typeof itemData === 'string' ? JSON.parse(decodeURIComponent(itemData)) : itemData;
-            document.getElementById('modal-list-btn').onclick = () => toggleWatchlist(parsedItem);
+            document.getElementById('modal-list-btn').onclick = function() { toggleWatchlist(parsedItem); };
         }
 
         function closeModal() {
-            document.getElementById('player-modal').classList.add('hidden');
+            document.getElementById('player-modal').style.display = 'none';
             document.getElementById('video-iframe').src = '';
         }
 
@@ -229,37 +258,45 @@
                 if (query.length === 0) resetHome();
                 return;
             }
-            searchTimeout = setTimeout(async () => {
+            searchTimeout = setTimeout(async function() {
                 const data = await fetchData('/search/multi?query=' + encodeURIComponent(query));
-                showGrid('Search Results for "' + query + '"', data.results);
+                if (data && data.results) {
+                    showGrid('Search: ' + query, data.results);
+                }
             }, 500);
         }
 
         async function fetchCategory(endpoint, title) {
             const data = await fetchData('/' + endpoint);
-            showGrid(title, data.results);
+            if (data && data.results) {
+                showGrid(title, data.results);
+            }
         }
 
         function showGrid(title, items) {
-            document.getElementById('hero-section').classList.add('hidden');
-            document.getElementById('sections-container').classList.add('hidden');
+            document.getElementById('hero-section').style.display = 'none';
+            document.getElementById('sections-container').style.display = 'none';
             const gridContainer = document.getElementById('grid-container');
-            gridContainer.classList.remove('hidden');
+            gridContainer.style.display = 'block';
             document.getElementById('grid-title').innerText = title;
-            document.getElementById('grid-items').innerHTML = items.map(item => createCardHTML(item)).join('');
+            let html = '';
+            for (let i = 0; i < items.length; i++) {
+                html += createCardHTML(items.at(i));
+            }
+            document.getElementById('grid-items').innerHTML = html;
         }
 
         function resetHome() {
             document.getElementById('searchInput').value = '';
-            document.getElementById('grid-container').classList.add('hidden');
-            document.getElementById('hero-section').classList.remove('hidden');
-            document.getElementById('sections-container').classList.remove('hidden');
+            document.getElementById('grid-container').style.display = 'none';
+            document.getElementById('hero-section').style.display = 'flex';
+            document.getElementById('sections-container').style.display = 'block';
         }
 
         function toggleWatchlist(item) {
-            const exists = watchlist.some(w => w.id === item.id);
+            const exists = watchlist.some(function(w) { return w.id === item.id; });
             if (exists) {
-                watchlist = watchlist.filter(w => w.id !== item.id);
+                watchlist = watchlist.filter(function(w) { return w.id !== item.id; });
                 alert('Removed from My List');
             } else {
                 watchlist.push(item);
